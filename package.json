@@ -1,0 +1,16 @@
+{
+  "name": "scuttle",
+  "version": "0.0.1",
+  "description": "Scuttle is S3 compatible object storage using GridFS as a backend",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Teemu Heikkilä",
+  "license": "MIT",
+  "dependencies": {
+    "gridfs-stream": "^1.1.0",
+    "mongoose": "^3.8.25",
+    "restify": "^3.0.1"
+  }
+}
