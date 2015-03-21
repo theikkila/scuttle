@@ -9,8 +9,12 @@
   "author": "Teemu Heikkilä",
   "license": "MIT",
   "dependencies": {
+    "concat-stream": "^1.4.7",
     "gridfs-stream": "^1.1.0",
+    "jstoxml": "^0.2.3",
+    "lodash": "^3.5.0",
     "mongoose": "^3.8.25",
-    "restify": "^3.0.1"
+    "restify": "^3.0.1",
+    "xml2js": "^0.4.6"
   }
 }
