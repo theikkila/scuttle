@@ -29,14 +29,16 @@ module.exports = function objectsctrl (server, models) {
 					res.setHeader('Last-Modified', new Date(obj.modifiedDate).toUTCString());
 					var noneMatch = req.headers['if-none-match'];
 					if (noneMatch && (noneMatch === obj.md5 || noneMatch === '*')) {
-						return res.status(304).end();
+						res.send(304);
+						return next();
 					}
 					var modifiedSince = req.headers['if-modified-since'];
 					if (modifiedSince) {
 						var time = new Date(modifiedSince);
 						var modifiedDate = new Date(obj.modifiedDate);
 						if (time >= modifiedDate) {
-							return res.status(304).end();
+							res.send(304);
+							return next();
 						}
 					}
 					var range = null;
