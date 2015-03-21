@@ -5,6 +5,7 @@ var xml2js = require('xml2js');
 mongoose.connect(process.env.MONGODB || 'mongodb://localhost/scuttle');
 var s3hostname = process.env.S3HOSTNAME || "s3.amazonaws.com";
 
+var xml = require('./lib/xmltemplates');
 var models = require('./models/all')(mongoose);
 
 var server = restify.createServer();
@@ -26,25 +27,45 @@ server.use(function (req, res, next) {
 	}));
 });
 */
-server.use(function (req, res, next) {
-	/*
-	try {
+//models.AccessToken({name:"default", token:"accesstokenhere"}).save();
+function accessdenied (res) {
+	res.setHeader('content-type', 'text/xml');
+	res.status(401)
+	res.send(xml.buildError(401, "Access Denied"));
+}
 
-		xml2js.parseString(req.data, function (err, result) {
-			if (err) {
-				req.xml = null;
-				next();
+server.use(function (req, res, next) {
+	var auth = req.authorization;
+	var readonly = ['GET', 'HEAD'];
+	if (readonly.indexOf(req.method) !== -1) {
+		return next();
+	}
+	if (auth.scheme === "AWS4-HMAC-SHA256") {
+		console.log(auth);
+		var parts = auth.credentials.split(',');
+		var credhead = {};
+		parts.forEach(function (line) {
+			var p = line.split('=');
+			credhead[p[0]] = p[1];
+		});
+		var cs = credhead.Credential.split('/');
+		var creds = {};
+		creds.accesskey = cs[0];
+		creds.date = cs[1];
+		creds.region = cs[2];
+		creds.service = cs[3];
+		models.AccessToken.findOne({token: creds.accesskey}, function (err, token) {
+			next.ifError(err);
+			console.log(token)
+			if (token) {
+				return next();
 			} else {
-				req.xml = result;
-				next();
+				accessdenied(res);
 			}
 		});
-	} catch (e) {
-		console.log(e);
-		req.xml = null;
-		next();
-	}*/
-	next();
+	} else {
+		accessdenied(res);
+	}
 });
 
 
@@ -63,7 +84,6 @@ server.use(function (req, res, next) {
 
 
 // Routing
-var xml = require('./lib/xmltemplates');
 require('./router')(server, models);
 /*
 var f = function (req, res, next) {
@@ -85,6 +105,6 @@ var f = function (req, res, next) {
 server.on('uncaughtException', function (request, response, route, error) {
 	console.log(error.stack);
 });
-server.listen(80, function() {
+server.listen(8080, function() {
 	console.log('%s listening at %s', server.name, server.url);
 });

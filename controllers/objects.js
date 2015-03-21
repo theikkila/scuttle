@@ -78,7 +78,7 @@ function deleteObject (req, res, next) {
 		}
 		obj.remove(function (err, obj) {
 			next.ifError(err);
-			res.status(204).end();
+			res.send(204);
 			return next();
 		});
 	});
