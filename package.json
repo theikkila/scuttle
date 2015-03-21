@@ -14,7 +14,9 @@
     "jstoxml": "^0.2.3",
     "lodash": "^3.5.0",
     "mongoose": "^3.8.25",
+    "node-uuid": "^1.4.3",
     "restify": "^3.0.1",
+    "simple-bufferstream": "^1.0.0",
     "xml2js": "^0.4.6"
   }
 }

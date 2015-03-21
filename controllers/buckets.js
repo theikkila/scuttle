@@ -82,10 +82,25 @@ module.exports = function bucketsctrl (server, models) {
 		});
 	}
 
+	function deleteBucket (req, res, next) {
+		models.S3Object.find({bucket: req.bucket.id}, function (err, objects) {
+			next.ifError(err);
+			if (objects.length > 0) {
+				res.setHeader('content-type', 'text/xml');
+				res.send(409, xml.buildBucketNotEmpty(req.bucket.name));
+				return next();
+			}
+			req.bucket.remove(function (err, bucket) {
+				res.send(204);
+			});
+		});
+	}
+
 	return {
 		getBuckets: getBuckets,
 		getBucket: getBucket,
 		putBucket: putBucket,
+		deleteBucket: deleteBucket,
 		bucketExists: bucketExists
 	};
 };

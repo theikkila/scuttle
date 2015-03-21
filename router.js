@@ -3,12 +3,10 @@ module.exports = function router (server, models) {
 
 	server.get('/', ctrls.bucketExists, ctrls.getBucket);
 	server.put('/', ctrls.putBucket);
+	server.del('/', ctrls.bucketExists, ctrls.deleteBucket);
+	server.put(/^\/(.*)/, ctrls.bucketExists, ctrls.putObject);
+	server.get(/^\/(.*)/, ctrls.bucketExists, ctrls.getObject);
+	server.head(/^\/(.*)/, ctrls.bucketExists, ctrls.getObject);
+	server.del(/^\/(.*)/, ctrls.bucketExists, ctrls.deleteObject);
 	server.get({name:"services", path:'/'}, ctrls.getBuckets);
-	/*
-	server.delete('/:bucket', ctrls.bucketExists, ctrls.deleteBucket);
-	server.put('/:bucket/:key(*)', ctrls.bucketExists, ctrls.putObject);
-	server.get('/:bucket/:key(*)', ctrls.bucketExists, ctrls.getObject);
-	server.head('/:bucket/:key(*)', ctrls.getObject);
-	server.delete('/:bucket/:key(*)', ctrls.bucketExists, ctrls.deleteObject);
-	*/
 };
