@@ -9,6 +9,7 @@
   "author": "Teemu Heikkilä",
   "license": "MIT",
   "dependencies": {
+    "combined-stream": "0.0.7",
     "concat-stream": "^1.4.7",
     "gridfs-stream": "^1.1.0",
     "jstoxml": "^0.2.3",

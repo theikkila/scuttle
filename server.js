@@ -83,7 +83,7 @@ server.use(function (req, res, next) {
 });
 
 
-server.use(restify.bodyParser());
+//server.use(restify.bodyParser());
 
 server.use(function (req, res, next) {
 	var bucket = req.headers.host.replace(s3hostname, '').replace('.', '').split(':')[0];

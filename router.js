@@ -5,6 +5,7 @@ module.exports = function router (server, models) {
 	server.put('/', ctrls.putBucket);
 	server.del('/', ctrls.bucketExists, ctrls.deleteBucket);
 	server.put(/^\/(.*)/, ctrls.bucketExists, ctrls.putObject);
+	server.post(/^\/(.*)/, ctrls.bucketExists, ctrls.mpInitiate); // Multipart-upload init
 	server.get(/^\/(.*)/, ctrls.bucketExists, ctrls.getObject);
 	server.head(/^\/(.*)/, ctrls.bucketExists, ctrls.getObject);
 	server.del(/^\/(.*)/, ctrls.bucketExists, ctrls.deleteObject);
