@@ -11,6 +11,7 @@ module.exports = function controllers (server, models) {
 		putBucket: buckets.putBucket,
 		getObject: objects.getObject,
 		deleteObject: objects.deleteObject,
-		putObject: objects.putObject
+		putObject: objects.putObject,
+		mpInitiate: objects.mpInitiate
 	};
 };
