@@ -14,6 +14,7 @@ function errCustom (res, code, message) {
 }
 
 function err500 (res) {
+	console.trace("500ERR");
 	res.setHeader('content-type', 'text/xml');
 	var template = xml.buildError('InternalError',
 		'We encountered an internal error. Please try again.');
@@ -241,19 +242,21 @@ function putObject (req, res, next) {
 		console.log("Uploading part " + req.query.uploadId + "; " + req.query.partNumber);
 	return handleMultipart(req, res, next);
 }
+/*
 if (!req.body){
 	err500(res);
 	return next();
 }
 var reader = sbuff(req.body);
-streamS3Object(req.bucket, req.params.key, req.headers['content-type'], reader,
+*/
+streamS3Object(req.bucket, req.params.key, req.headers['content-type'], req,
 	function (err, obj) {
 		if (err) {
 				// 500
 				err500(res);
 				return next();
 			}
-			res.setHeader('ETag', obj.md5);
+			res.setHeader('ETag', '"'+obj.md5+'"');
 			res.send(200);
 			return next();
 		});
