@@ -27,7 +27,7 @@ server.use(function (req, res, next) {
 	}));
 });
 */
-//models.AccessToken({name:"default", token:"accesstokenhere"}).save();
+
 function accessdenied (res) {
 	res.setHeader('content-type', 'text/xml');
 	res.status(401)
@@ -64,7 +64,19 @@ server.use(function (req, res, next) {
 				return next(false);
 			}
 		});
+	} else if (auth.scheme === "AWS"){
+		var parts = auth.credentials.split(':');
+		console.log(parts, auth);
+		models.AccessToken.findOne({token: parts[0]}, function (err, token) {
+			next.ifError(err);
+			if (token) { return next(); }
+			else {
+				accessdenied(res);
+				return next(false);
+			}
+		});
 	} else {
+		console.log(auth);
 		accessdenied(res);
 		return next(false);
 	}
@@ -74,7 +86,7 @@ server.use(function (req, res, next) {
 server.use(restify.bodyParser());
 
 server.use(function (req, res, next) {
-	var bucket = req.headers.host.replace(s3hostname, '').replace('.', '');
+	var bucket = req.headers.host.replace(s3hostname, '').replace('.', '').split(':')[0];
 	req.bucket = bucket === '' ? null : bucket;
 	if (bucket === '' && req.path() === '/') {
 		req.bucket = null;
