@@ -31,13 +31,13 @@ server.use(function (req, res, next) {
 function accessdenied (res) {
 	res.setHeader('content-type', 'text/xml');
 	res.status(401)
-	res.send(xml.buildError(401, "Access Denied"));
+	res.end(xml.buildError(401, "Access Denied"));
 }
 
 server.use(function (req, res, next) {
 	var auth = req.authorization;
 	var readonly = ['GET', 'HEAD'];
-	if (readonly.indexOf(req.method) !== -1) {
+	if (readonly.indexOf(req.method) !== -1 && req.path() !== '/') {
 		return next();
 	}
 	if (auth.scheme === "AWS4-HMAC-SHA256") {
@@ -61,10 +61,12 @@ server.use(function (req, res, next) {
 				return next();
 			} else {
 				accessdenied(res);
+				return next(false);
 			}
 		});
 	} else {
 		accessdenied(res);
+		return next(false);
 	}
 });
 
@@ -74,7 +76,7 @@ server.use(restify.bodyParser());
 server.use(function (req, res, next) {
 	var bucket = req.headers.host.replace(s3hostname, '').replace('.', '');
 	req.bucket = bucket === '' ? null : bucket;
-	if (bucket === '') {
+	if (bucket === '' && req.path() === '/') {
 		req.bucket = null;
 		next('services');
 	} else {
@@ -105,6 +107,6 @@ var f = function (req, res, next) {
 server.on('uncaughtException', function (request, response, route, error) {
 	console.log(error.stack);
 });
-server.listen(8080, function() {
+server.listen(process.env.PORT || 8080, function() {
 	console.log('%s listening at %s', server.name, server.url);
 });

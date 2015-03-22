@@ -3,12 +3,12 @@ var xml = require('../lib/xmltemplates');
 
 module.exports = function bucketsctrl (server, models) {
 	function getBuckets (req, res, next) {
-
 		models.Bucket.find({}, function (err, buckets) {
 			next.ifError(err);
+			res.status(200);
 			res.setHeader('content-type', 'text/xml');
 			res.send(xml.buildBuckets(buckets));
-			next();
+			return next();
 		});
 	}
 
@@ -17,11 +17,12 @@ module.exports = function bucketsctrl (server, models) {
 			next.ifError(err);
 			if (!bucket) {
 				res.setHeader('content-type', 'text/xml');
-				res.send(404, xml.buildBucketNotFound(req.bucket));
-				next();
+				res.status(404);
+				res.end(xml.buildBucketNotFound(req.bucket));
+				return next(false);
 			} else {
 				req.bucket = bucket;
-				next();
+				return next();
 			}
 		});
 	}
@@ -36,7 +37,9 @@ module.exports = function bucketsctrl (server, models) {
 		models.S3Object.find({bucket: req.bucket.id}, function (err, objects) {
 			next.ifError(err);
 			res.setHeader('content-type', 'text/xml');
-			res.send(200, xml.buildBucketQuery(options, objects));
+			res.status(200);
+			res.end(xml.buildBucketQuery(options, objects));
+			return next();
 		});
 	}
 
