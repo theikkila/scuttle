@@ -41,7 +41,6 @@ server.use(function (req, res, next) {
 		return next();
 	}
 	if (auth.scheme === "AWS4-HMAC-SHA256") {
-		console.log(auth);
 		var parts = auth.credentials.split(',');
 		var credhead = {};
 		parts.forEach(function (line) {
@@ -56,7 +55,6 @@ server.use(function (req, res, next) {
 		creds.service = cs[3];
 		models.AccessToken.findOne({token: creds.accesskey}, function (err, token) {
 			next.ifError(err);
-			console.log(token)
 			if (token) {
 				return next();
 			} else {
@@ -66,7 +64,6 @@ server.use(function (req, res, next) {
 		});
 	} else if (auth.scheme === "AWS"){
 		var parts = auth.credentials.split(':');
-		console.log(parts, auth);
 		models.AccessToken.findOne({token: parts[0]}, function (err, token) {
 			next.ifError(err);
 			if (token) { return next(); }
@@ -76,7 +73,6 @@ server.use(function (req, res, next) {
 			}
 		});
 	} else {
-		console.log(auth);
 		accessdenied(res);
 		return next(false);
 	}
