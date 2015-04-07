@@ -7,7 +7,7 @@ RUN apt-get update
 
 WORKDIR /data
 ADD . /data
-RUN ln -s /data/supervisor.conf /etc/supervisor/conf.d/
+#RUN ln -s /data/supervisor.conf /etc/supervisor/conf.d/
 RUN npm config set registry http://registry.npmjs.org/
 RUN cd /data && npm install
 ENV PORT 80
