@@ -11,6 +11,7 @@ var models = require('./models/all')(mongoose);
 var server = restify.createServer();
 
 server.s3hostname = s3hostname;
+server.maxresize = 2000;
 server.use(restify.CORS());
 server.use(restify.authorizationParser());
 server.use(restify.dateParser());
