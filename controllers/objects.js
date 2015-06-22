@@ -104,7 +104,7 @@ module.exports = function objectsctrl (server, models) {
 		var max_height = req.query.maxheight ? Math.min(parseInt(req.query.maxheight), server.maxresize) : null;
 		var bucket = req.bucket.id;
 		// This compose key for resized 
-		var resized_key = req.params.key + (max_width || 'A') + 'x' + (max_height || 'A') + '.jpg';
+		var resized_key = req.params.key + (max_width || 'A') + 'x' + (max_height || 'A') + '.png';
 		var resized = getS3Object({
 			bucket: bucket,
 			key: resized_key
@@ -132,18 +132,18 @@ module.exports = function objectsctrl (server, models) {
 					pipeline.resize(max_width, max_height)
 					pipeline.max()
 					pipeline.progressive()
-					pipeline.toFormat('jpeg')
+					pipeline.toFormat('png')
 					pipeline.toBuffer(function(err, outputBuffer, info) {
 						if (err) {
 							return returnNotFoundFile(resized_key, req, res, next);
 						}
-						res.setHeader('Content-Type', 'image/jpeg');
+						res.setHeader('Content-Type', 'image/png');
 						res.setHeader('Content-Length', info.size);
 						res.end(outputBuffer);
 						next();
 						outputStream = sbuff(outputBuffer);
 						// Save the resized image into gridfs
-						streamS3Object({id: bucket}, resized_key, 'image/jpeg', outputStream, function (err, obj) {});
+						streamS3Object({id: bucket}, resized_key, 'image/png', outputStream, function (err, obj) {});
 					});
 			});
 				s3obj.getFileReadStream().pipe(concatStream);
