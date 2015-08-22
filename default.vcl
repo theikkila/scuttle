@@ -17,18 +17,18 @@ acl purge {
         "172.16.0.0"/12;
 }
 
-sub vcl_fetch {	
+sub vcl_backend_response {  
     # TTL 1 min
     set beresp.ttl = 1m;
-	if (req.url ~ "\.(avi|mp4|ogv|deb|tar|gz|rar||zip)$") {
-    	set beresp.do_stream = true;
-    	set beresp.ttl = 3m;
-	}
+    if (bereq.url ~ "\.(avi|mp4|ogv|deb|tar|gz|rar||zip)$") {
+        set beresp.do_stream = true;
+        set beresp.ttl = 3m;
+    }
 }
 
 sub vcl_recv {
-   	unset req.http.Cookie;
-    if (req.request != "GET" && req.request != "HEAD"){   
+    unset req.http.Cookie;
+    if (req.method != "GET" && req.method != "HEAD"){   
         return (pass);
     }
     if (req.url ~ "^[^?]*\.(mp[34]|rar|tar|tgz|gz|wav|iso|img|dmg|mkv|ogv|avi|zip)(\?.*)?$") {
@@ -40,24 +40,27 @@ sub vcl_recv {
         return (pass);
     }
         # Allow purging
-    if (req.request == "PURGE") {
+    if (req.method == "PURGE") {
         if (!client.ip ~ purge) {
             # Not from an allowed IP? Then die with an error.
-            error 405 "This IP is not allowed to send PURGE requests.";
+            return (synth(405, "This IP is not allowed to send PURGE requests."));
         }
 
         # If you got this stage (and didn't error out above), do a cache-lookup
         # That will force entry into vcl_hit() or vcl_miss() below and purge the actual cache
-        return (lookup);
+        return (hash);
     }
 }
 
 
 sub vcl_hit {
     # Allow purges
-    if (req.request == "PURGE") {
-        purge;
-        error 200 "purged";
+    if (req.method == "PURGE") {
+        #
+        # This is now handled in vcl_recv.
+        #
+        # purge;
+        return (synth(200, "purged"));
     }
 
     return (deliver);
@@ -65,9 +68,12 @@ sub vcl_hit {
 
 sub vcl_miss {
     # Allow purges
-    if (req.request == "PURGE") {
-        purge;
-        error 200 "purged";
+    if (req.method == "PURGE") {
+        #
+        # This is now handled in vcl_recv.
+        #
+        # purge;
+        return (synth(200, "purged"));
     }
 
     return (fetch);
