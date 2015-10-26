@@ -42,6 +42,7 @@ server.use(function (req, res, next) {
 		return next();
 	}
 	if (auth.scheme === "AWS4-HMAC-SHA256") {
+		res.awsclient = true;
 		var parts = auth.credentials.split(',');
 		var credhead = {};
 		parts.forEach(function (line) {
@@ -64,6 +65,7 @@ server.use(function (req, res, next) {
 			}
 		});
 	} else if (auth.scheme === "AWS"){
+		res.awsclient = true;
 		var parts = auth.credentials.split(':');
 		models.AccessToken.findOne({token: parts[0]}, function (err, token) {
 			next.ifError(err);

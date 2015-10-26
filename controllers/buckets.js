@@ -83,8 +83,9 @@ module.exports = function bucketsctrl (server, models) {
 		};
 		models.S3Object.find({bucket: req.bucket.id}, function (err, objects) {
 			next.ifError(err);
+
 			var inx = _.find(objects, {key: 'index.html'});
-			if (inx) {
+			if (inx && !res.awsclient) {
 				return returnFoundFile(inx, req, res, next);	
 			}
 			
