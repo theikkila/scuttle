@@ -38,7 +38,7 @@ function accessdenied (res) {
 server.use(function (req, res, next) {
 	var auth = req.authorization;
 	var readonly = ['GET', 'HEAD'];
-	if (readonly.indexOf(req.method) !== -1 && req.path() !== '/') {
+	if (readonly.indexOf(req.method) !== -1) {
 		return next();
 	}
 	if (auth.scheme === "AWS4-HMAC-SHA256") {
