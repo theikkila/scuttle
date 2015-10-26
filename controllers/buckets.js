@@ -1,4 +1,51 @@
 var xml = require('../lib/xmltemplates');
+var _ = require('lodash');
+
+function handleRange (req, res, obj) {
+	var range = null;
+	if (req.headers['range']) {
+		var r = req.headers['range'].replace('bytes=', '').split('-');
+		range = {startPos: parseInt(r[0])};
+		range.endPos = obj.size;
+		if (r[1] !== '') {
+			range.endPos = parseInt(r[1]);
+		}
+		res.setHeader('Content-Range', "bytes " + range.startPos+'-'+range.endPos+'/'+obj.size);
+		res.status(206);
+	}
+	return range
+}
+
+function returnFoundFile (s3obj, req, res, next) {
+	res.setHeader('Content-Type', s3obj.contentType);
+	res.setHeader('Accept-Ranges', 'bytes');
+	res.setHeader('Content-Length', s3obj.size);
+	res.setHeader('Etag', s3obj.md5);
+	res.setHeader('Last-Modified', new Date(s3obj.modifiedDate).toUTCString());
+	var noneMatch = req.headers['if-none-match'];
+	if (noneMatch && (noneMatch === s3obj.md5 || noneMatch === '*')) {
+		res.send(304);
+		return next();
+	}
+	var modifiedSince = req.headers['if-modified-since'];
+	if (modifiedSince) {
+		var time = new Date(modifiedSince);
+		var modifiedDate = new Date(s3obj.modifiedDate);
+		if (time >= modifiedDate) {
+			res.send(304);
+			return next();
+		}
+	}
+	var range = handleRange(req, res, s3obj);
+	res.status(200)
+	if (req.method === 'HEAD') {
+		res.end();
+		return next();
+	}
+	var reader = s3obj.getFileReadStream(range);
+	reader.pipe(res);
+	return next();
+}
 
 
 module.exports = function bucketsctrl (server, models) {
@@ -36,6 +83,11 @@ module.exports = function bucketsctrl (server, models) {
 		};
 		models.S3Object.find({bucket: req.bucket.id}, function (err, objects) {
 			next.ifError(err);
+			var inx = _.find(objects, {key: 'index.html'});
+			if (inx) {
+				return returnFoundFile(inx, req, res, next);	
+			}
+			
 			res.setHeader('content-type', 'text/xml');
 			res.status(200);
 			res.end(xml.buildBucketQuery(options, objects));
