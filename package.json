@@ -18,8 +18,8 @@
     "node-uuid": "^1.4.3",
     "q": "^1.4.1",
     "restify": "^4.0.4",
-    "sharp": "^0.10.0",
+    "sharp": "^0.14.0",
     "simple-bufferstream": "^1.0.0",
-    "xml2js": "^0.4.6"
+    "xml2js": "^0.4.16"
   }
 }
