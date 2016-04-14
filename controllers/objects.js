@@ -66,6 +66,7 @@ module.exports = function objectsctrl (server, models) {
 		return next(false);
 	}
 	function returnFoundFile (s3obj, req, res, next) {
+		console.log("Return found file", s3obj);
 		res.setHeader('Content-Type', s3obj.contentType);
 		res.setHeader('Accept-Ranges', 'bytes');
 		res.setHeader('Content-Length', s3obj.size);
@@ -338,6 +339,7 @@ function putObject (req, res, next) {
 	}
 	var reader = sbuff(req.body);
 	*/
+	console.log(req.bucket, req.params.key);
 	streamS3Object(req.bucket, req.params.key, req.headers['content-type'], req,
 	function (err, obj) {
 		if (err) {
