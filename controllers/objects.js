@@ -342,6 +342,7 @@ function putObject (req, res, next) {
 	console.log(req.bucket, req.params.key);
 	streamS3Object(req.bucket, req.params.key, req.headers['content-type'], req,
 	function (err, obj) {
+		console.log(err, obj);
 		if (err) {
 				// 500
 				err500(res);
