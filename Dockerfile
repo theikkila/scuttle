@@ -18,7 +18,7 @@ RUN cd /data && npm install
 EXPOSE 80
 
 # If only using node without varnish uncomment next;
-#ENV PORT 80
-#CMD ["/usr/local/bin/node", "/data/server.js"]
+ENV PORT 80
+CMD ["/usr/local/bin/node", "/data/server.js"]
 # Disable supervisord if using only node.js
-CMD ["supervisord", "-n"]
+#CMD ["supervisord", "-n"]
