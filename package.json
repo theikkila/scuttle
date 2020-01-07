@@ -14,7 +14,7 @@
     "gridfs-stream": "^1.1.1",
     "jstoxml": "^0.2.3",
     "lodash": "^4.11.0",
-    "mongoose": "4.4.12",
+    "mongoose": "5.8.5",
     "node-uuid": "^1.4.3",
     "q": "^1.4.1",
     "restify": "^4.0.4",
